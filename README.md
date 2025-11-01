@@ -1,4 +1,4 @@
-# SMK Negeri 1 Maja - Website Clone
+# SMK Negeri 1 Maja - Website By Refan
 
 Complete clone of the SMK Negeri 1 Maja official website with all pages, responsive design, and modern UI.
 
