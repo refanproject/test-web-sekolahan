@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kalender Akademik SMK Negeri 1 Maja">
+    <title>Kalender Akademik - SMK Negeri 1 Maja</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .calendar-container {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .calendar-header h2 {
+            color: var(--primary-color);
+            font-size: 1.75rem;
+            margin: 0;
+        }
+
+        .calendar-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .calendar-controls button {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .calendar-controls button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .calendar-controls select {
+            padding: 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: var(--white);
+            color: var(--text-color);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary-color);
+            padding: 15px 5px;
+            background-color: var(--light-color);
+            border-radius: 5px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 5px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .calendar-day:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .calendar-day.today {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+
+        .calendar-day.has-event {
+            background-color: var(--light-color);
+            border-color: var(--accent-color);
+        }
+
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+        }
+
+        .calendar-day.today.has-event::after {
+            background-color: var(--white);
+        }
+
+        .day-number {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .day-event-count {
+            font-size: 0.75rem;
+            color: var(--text-color);
+        }
+
+        .calendar-day.today .day-event-count {
+            color: var(--white);
+        }
+
+        .events-list {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+        }
+
+        .events-list h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .event-item {
+            padding: 20px;
+            border-left: 4px solid var(--primary-color);
+            background-color: var(--light-color);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .event-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow);
+        }
+
+        .event-item.holiday {
+            border-left-color: #ef4444;
+        }
+
+        .event-item.exam {
+            border-left-color: #f59e0b;
+        }
+
+        .event-item.activity {
+            border-left-color: var(--primary-color);
+        }
+
+        .event-date {
+            font-size: 0.875rem;
+            color: var(--text-color);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .event-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .event-description {
+            font-size: 0.875rem;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .event-category {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .event-category.holiday {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .event-category.exam {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .event-category.activity {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: var(--light-color);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .legend-color.holiday {
+            background-color: #ef4444;
+        }
+
+        .legend-color.exam {
+            background-color: #f59e0b;
+        }
+
+        .legend-color.activity {
+            background-color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .calendar-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .calendar-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .calendar-controls button,
+            .calendar-controls select {
+                width: 100%;
+            }
+
+            .calendar-day-header {
+                font-size: 0.75rem;
+                padding: 10px 2px;
+            }
+
+            .calendar-day {
+                min-height: 60px;
+                padding: 5px 2px;
+            }
+
+            .day-number {
+                font-size: 0.875rem;
+            }
+
+            .day-event-count {
+                font-size: 0.625rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-content">
+                <span class="date">Sat. Nov 1st, 2025</span>
+                <div class="top-bar-links">
+                    <a href="https://www.facebook.com/smkn1maja" target="_blank" class="social-btn facebook" title="Facebook">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="https://www.instagram.com/smkn1maja" target="_blank" class="social-btn instagram" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.youtube.com/@smkn1maja" target="_blank" class="social-btn youtube" title="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://twitter.com/smkn1maja" target="_blank" class="social-btn twitter" title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="../images/sekolahan.jpg" alt="Logo SMK Negeri 1 Maja" class="logo">
+                    <div class="logo-text">
+                        <h1>SMK Negeri 1 Maja</h1>
+                        <p class="tagline">SMK Unggulan yang Menghasilkan SDM Bermutu dan Berdaya Saing Tinggi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../index.html">Beranda</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Profil <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../profil/sejarah.html">Sejarah Singkat</a></li>
+                        <li><a href="../profil/kepala-sekolah.html">Prakata Kepala Sekolah</a></li>
+                        <li><a href="../profil/visi-misi.html">Visi dan Misi</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Kurikulum <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="kalender.html" class="active">Kalender Akademik</a></li>
+                        <li><a href="rpl.html">Rekayasa Perangkat Lunak</a></li>
+                        <li><a href="sija.html">Sistem Informasi Jaringan dan Aplikasi</a></li>
+                    </ul>
+                </li>
+                <li><a href="../berita/index.html">Berita</a></li>
+                <li><a href="../kontak.html">Kontak</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1>Kalender Akademik</h1>
+            <div class="breadcrumb">
+                <a href="../index.html">Beranda</a>
+                <span>/</span>
+                <a href="#">Kurikulum</a>
+                <span>/</span>
+                <span>Kalender Akademik</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <section class="content-section">
+        <div class="container">
+            <!-- Calendar -->
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h2 id="currentMonthYear">November 2025</h2>
+                    <div class="calendar-controls">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <select id="monthSelect">
+                            <option value="0">Januari</option>
+                            <option value="1">Februari</option>
+                            <option value="2">Maret</option>
+                            <option value="3">April</option>
+                            <option value="4">Mei</option>
+                            <option value="5">Juni</option>
+                            <option value="6">Juli</option>
+                            <option value="7">Agustus</option>
+                            <option value="8">September</option>
+                            <option value="9">Oktober</option>
+                            <option value="10">November</option>
+                            <option value="11">Desember</option>
+                        </select>
+                        <select id="yearSelect"></select>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar will be generated here -->
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color holiday"></div>
+                        <span>Libur/Hari Besar</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color exam"></div>
+                        <span>Ujian/Penilaian</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color activity"></div>
+                        <span>Kegiatan Sekolah</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events List -->
+            <div class="events-list">
+                <h3>Agenda Kegiatan</h3>
+                <div id="eventsList">
+                    <!-- Events will be generated here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SMK Negeri 1 Maja</h3>
+                    <p>SMK Unggulan yang Menghasilkan SDM Bermutu dan Berdaya Saing Tinggi</p>
+                    <div class="social-links">
+                        <a href="#" target="_blank" class="facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" target="_blank" class="instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" target="_blank" class="youtube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" target="_blank" class="twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Tautan Cepat</h4>
+                    <ul>
+                        <li><a href="../profil/visi-misi.html">Visi dan Misi</a></li>
+                        <li><a href="../profil/sejarah.html">Sejarah</a></li>
+                        <li><a href="kalender.html">Kalender Akademik</a></li>
+                        <li><a href="../program/ekstrakulikuler.html">Ekstrakulikuler</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Kontak</h4>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 4864+4F2, Maja Sel., Kec. Maja, Kabupaten Majalengka, Jawa Barat</li>
+                        <li><i class="fas fa-phone"></i> (022) 6629683</li>
+                        <li><i class="fas fa-envelope"></i> info@smkn1-maja.sch.id</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 SMK Negeri 1 Maja. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/calendar.js"></script>
+</body>
+</html>
